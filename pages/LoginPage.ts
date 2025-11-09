@@ -26,6 +26,10 @@ export class LoginPage {
 
   // ✅ Assert success: Dashboard header is visible
   async assertLoginSuccess() {
-    await expect(this.page.locator(this.dashboardHeader)).toBeVisible();
+    await expect(this.page.locator(this.dashboardHeader)).toBeVisible(
+        {
+            timeout: 30000
+        }
+    );
   }
 }

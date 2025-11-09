@@ -2,6 +2,8 @@ import { test, expect } from '@playwright/test';
 import { LoginPage } from '../pages/LoginPage';
 import { config } from '../utils/config';
 
+const authFile = 'playwright/.auth/user.json'; // ✅ where to save session
+
 test('Mime Connect Login Flow', async ({ page }) => {
   const loginPage = new LoginPage(page);
 
@@ -16,4 +18,7 @@ test('Mime Connect Login Flow', async ({ page }) => {
   await test.step('Verify dashboard appears', async () => {
     await loginPage.assertLoginSuccess();
   });
+
+    // ✅ Save cookies and local storage
+  await page.context().storageState({ path: authFile });
 });

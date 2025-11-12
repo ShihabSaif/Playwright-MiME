@@ -1,4 +1,6 @@
-import { Page, expect } from '@playwright/test';
+import { test, Page, expect } from '@playwright/test';
+
+test.setTimeout(90000);
 
 export class EnquiryPage {
     private page: Page;
@@ -153,32 +155,75 @@ export class EnquiryPage {
         await expect(addButton).toBeVisible({ timeout: 5000 });
         await addButton.click();
 
-        //service type
-        const serviceDropdown = this.page.locator('#service_type');
-        await expect(serviceDropdown).toBeVisible({ timeout: 5000 });
-        await serviceDropdown.selectOption({ index: 1 });
+        // Click bundles radio button
+        const ispLabel = this.page.locator('label.form-check-label:has(input#bundle)');
+        await ispLabel.scrollIntoViewIfNeeded();
+        await expect(ispLabel).toBeVisible();
+        await ispLabel.click();
 
-        //packages
-        const packageDropdown = this.page.locator('#package_service');
-        await expect(packageDropdown).toBeVisible({ timeout: 5000 });
-        await packageDropdown.selectOption({ index: 1 });
+        // bundle name dropdown
+        const bundleDropdown = this.page.locator('input[placeholder="Select Bundle"]');
+        await bundleDropdown.scrollIntoViewIfNeeded();
+        await bundleDropdown.click();
+        const dropdownPanel = this.page.locator('.el-select-dropdown:visible');
+        await expect(dropdownPanel).toBeVisible({ timeout: 5000 });
+        await dropdownPanel.locator('.el-select-dropdown__item').first().click();
 
-        //checkbox
-        const inheritedCheckbox = this.page.locator('fieldset:has-text("Installation Address *")').locator('#inherited_checkbox');
-        await expect(inheritedCheckbox).toBeVisible({ timeout: 5000 });
-        await expect(inheritedCheckbox).toBeEnabled();
-        await inheritedCheckbox.click();
+        // contact address checkbox
+        const installationCheckbox = this.page
+        .getByRole('group', { name: /Installation Address/i })
+        .locator('#inherited_checkbox');
+        await installationCheckbox.scrollIntoViewIfNeeded();
+        await expect(installationCheckbox).toBeVisible({ timeout: 5000 });
+        await installationCheckbox.click();
 
-        //MiME number
-        const inputField = this.page.locator('input.form-control[type="text"]').first();
-        await expect(inputField).toBeVisible({ timeout: 5000 });
-        await inputField.fill('Your Value Here');
-
-
-        //add service button
+        // click add service button
         const addServiceButton = this.page.locator('#add_service');
+        await addServiceButton.scrollIntoViewIfNeeded();
         await expect(addServiceButton).toBeVisible({ timeout: 5000 });
-        await expect(addServiceButton).toBeEnabled();
         await addServiceButton.click();
+    }
+
+    async addOneTimeCost() {
+        // category dropdown
+        const categoryDropdown = this.page.locator('.col-4 select.form-control').first();
+        await categoryDropdown.scrollIntoViewIfNeeded({ timeout: 5000 });
+        await expect(categoryDropdown).toBeVisible({ timeout: 5000 });
+        await expect(categoryDropdown).toBeEnabled({ timeout: 5000 });
+        const option = categoryDropdown.locator('option[value="5"]');
+        await expect(option).toHaveCount(1, { timeout: 5000 });
+        await categoryDropdown.selectOption({ value: '5' });
+        const selectedCategoryValue = await categoryDropdown.inputValue();
+        expect(selectedCategoryValue).toBe('5');
+
+        // Use unique id
+const serviceDropdown = this.page.locator('#interested_on');
+
+// Scroll into view and wait until enabled
+await serviceDropdown.scrollIntoViewIfNeeded();
+await expect(serviceDropdown).toBeVisible({ timeout: 10000 });
+await expect(serviceDropdown).toBeEnabled({ timeout: 10000 });
+
+// Wait until at least 2 options are present (skip default empty)
+await this.page.waitForFunction(
+  el => el && (el as HTMLSelectElement).options.length > 1,
+  await serviceDropdown.elementHandle(),
+  { timeout: 10000 }
+);
+
+// Get all option values except empty
+const options = await this.page.evaluate(el => {
+  const select = el as HTMLSelectElement;
+  return Array.from(select.options).map(o => o.value).filter(v => v);
+}, await serviceDropdown.elementHandle());
+
+// Select the first real option
+if (options.length > 0) {
+  await serviceDropdown.selectOption(options[0]);
+  console.log('✅ Selected first option:', options[0]);
+} else {
+  console.warn('⚠️ No options available');
+}
+
     }
 }

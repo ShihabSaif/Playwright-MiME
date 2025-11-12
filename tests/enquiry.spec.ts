@@ -21,6 +21,7 @@ test('Enquiry Flow', async ({ page }) => {
         await enquiryPage.assignRM();
         await enquiryPage.selectSalesPerson();
         await enquiryPage.addService();
+        await enquiryPage.addOneTimeCost();
         await page.pause(); // for debug
     });
 });

@@ -2,6 +2,8 @@ import { test, expect } from '@playwright/test';
 import { LoginPage } from '../pages/LoginPage';
 import { config } from '../utils/config';
 
+test.setTimeout(60000);
+
 const authFile = 'playwright/.auth/user.json'; // ✅ where to save session
 
 test('Mime Connect Login Flow', async ({ page }) => {

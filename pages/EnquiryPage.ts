@@ -196,34 +196,36 @@ export class EnquiryPage {
         const selectedCategoryValue = await categoryDropdown.inputValue();
         expect(selectedCategoryValue).toBe('5');
 
-        // Use unique id
-const serviceDropdown = this.page.locator('#interested_on');
+        // service dropdown
+        const serviceDropdown = this.page.locator('.col-4 select.form-control').nth(1);
+        await serviceDropdown.scrollIntoViewIfNeeded();
+        await expect(serviceDropdown).toBeVisible({ timeout: 5000 });
+        await expect(serviceDropdown).toBeEnabled({ timeout: 5000 });
+        await expect(serviceDropdown.locator('option[value="617"]')).toHaveCount(1, { timeout: 10000 });
+        await serviceDropdown.selectOption({ value: '617' });
+        const selectedValue = await serviceDropdown.inputValue();
+        expect(selectedValue).toBe('617');
+    }
 
-// Scroll into view and wait until enabled
-await serviceDropdown.scrollIntoViewIfNeeded();
-await expect(serviceDropdown).toBeVisible({ timeout: 10000 });
-await expect(serviceDropdown).toBeEnabled({ timeout: 10000 });
+    async clickOTCButton()
+    {
+        const addButton = this.page.locator('button.btn >> i.tim-icons.icon-simple-add').nth(3);
+        await expect(addButton).toBeVisible({ timeout: 5000 });
+        await addButton.click();
+    }
 
-// Wait until at least 2 options are present (skip default empty)
-await this.page.waitForFunction(
-  el => el && (el as HTMLSelectElement).options.length > 1,
-  await serviceDropdown.elementHandle(),
-  { timeout: 10000 }
-);
+    async clickSaveAndProceed()
+    {
+        const saveAndProceedButton = this.page.locator('button.btn.btn-rose', { hasText: 'Save & Proceed' });
 
-// Get all option values except empty
-const options = await this.page.evaluate(el => {
-  const select = el as HTMLSelectElement;
-  return Array.from(select.options).map(o => o.value).filter(v => v);
-}, await serviceDropdown.elementHandle());
+        // Ensure it’s visible and interactable
+        await saveAndProceedButton.scrollIntoViewIfNeeded();
+        await expect(saveAndProceedButton).toBeVisible({ timeout: 5000 });
+        await expect(saveAndProceedButton).toBeEnabled({ timeout: 5000 });
 
-// Select the first real option
-if (options.length > 0) {
-  await serviceDropdown.selectOption(options[0]);
-  console.log('✅ Selected first option:', options[0]);
-} else {
-  console.warn('⚠️ No options available');
-}
+        // Click the button
+        await saveAndProceedButton.click();
+        console.log('✅ Clicked "Save & Proceed" button successfully');
 
     }
 }

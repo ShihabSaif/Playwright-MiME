@@ -22,6 +22,8 @@ test('Enquiry Flow', async ({ page }) => {
         await enquiryPage.selectSalesPerson();
         await enquiryPage.addService();
         await enquiryPage.addOneTimeCost();
+        await enquiryPage.clickOTCButton();
+        await enquiryPage.clickSaveAndProceed()
         await page.pause(); // for debug
     });
 });

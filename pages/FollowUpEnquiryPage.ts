@@ -85,27 +85,38 @@ export class FollowUpEnquiryPage {
         expect(selectedValue).toBe('4');
     }
 
-    async NasDropdown()
+    async ServiceDetails()
     {
-        // Locate the NAS dropdown input
+        // 1️⃣ NAS Dropdown
         const nasInput = this.page.locator('input[placeholder="Select NAS"]');
-
-        // Ensure visible
-        await nasInput.scrollIntoViewIfNeeded();
-        await expect(nasInput).toBeVisible({ timeout: 5000 });
-
-        // Click to open dropdown
         await nasInput.click();
+        const nasDropdown = this.page.locator('.el-select-dropdown:visible');
+        await nasDropdown.locator('.el-select-dropdown__item').first().click();
+        await this.page.waitForTimeout(500);
 
-        // Wait for the dropdown panel
-        const dropdown = this.page.locator('.el-select-dropdown:visible');
-        await expect(dropdown).toBeVisible({ timeout: 5000 });
+        // 2️⃣ OLT Dropdown
+        const allSelectInputs = this.page.locator('input.el-input__inner[placeholder="Select"]');
+        const oltInput = allSelectInputs.nth(0);
+        await expect(oltInput).toBeVisible({ timeout: 5000 });
+        await oltInput.click();
+        const oltDropdown = this.page.locator('.el-select-dropdown:visible');
+        await expect(oltDropdown).toBeVisible({ timeout: 5000 });
+        await oltDropdown.locator('.el-select-dropdown__item').first().click({ force: true });
+        await this.page.waitForTimeout(500);
 
-        // Wait for items to load
-        const firstOption = dropdown.locator('.el-select-dropdown__item').first();
-        await expect(firstOption).toBeVisible({ timeout: 5000 });
+        // 3️⃣ PON Dropdown
+        const ponInput = allSelectInputs.nth(1);
+        await expect(ponInput).toBeVisible({ timeout: 5000 });
+        await ponInput.click();
+        const ponDropdown = this.page.locator('.el-select-dropdown:visible');
+        await expect(ponDropdown).toBeVisible({ timeout: 5000 });
+        await ponDropdown.locator('.el-select-dropdown__item').nth(1).click({ force: true });
+    }
 
-        // Click the first option
-        await firstOption.click({ force: true });
+    async submitButton()
+    {
+        const submitButton = this.page.locator('button:has-text("Submit")').nth(0);
+        await expect(submitButton).toBeVisible({ timeout: 5000 });
+        await submitButton.click();
     }
 }

@@ -39,9 +39,9 @@ export class EnquiryPage {
     async nameInput()
     {
         await this.page.locator('#salutation').selectOption('Mr');
-        await this.page.locator('#first_name').fill('John');
-        await this.page.locator('#middle_name').fill('david');
-        await this.page.locator('#last_name').fill('test');
+        await this.page.locator('#first_name').fill('Ishtian');
+        await this.page.locator('#middle_name').fill('Rahim');
+        await this.page.locator('#last_name').fill('Revee');
     }
 
     async mobileNoInput()

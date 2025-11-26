@@ -1,12 +1,14 @@
 import { test } from '@playwright/test';
 import { EnquiryPage } from '../pages/NewEnquiryPage';
 import { FollowUpEnquiryPage } from '../pages/FollowUpEnquiryPage';
+import { ConfirmEnquiryPage } from '../pages/ConfirmEnquiryPage';
 
 test.use({ storageState: 'playwright/.auth/user.json' });
 
 test('Enquiry Flow', async ({ page }) => {
     const enquiryPage = new EnquiryPage(page);
     const followUpEnquiryPage = new FollowUpEnquiryPage(page);
+    const confirmEnquiryPage = new ConfirmEnquiryPage(page);
 
     // Navigate to base URL
     await page.goto('/');
@@ -36,9 +38,12 @@ test('Enquiry Flow', async ({ page }) => {
         await followUpEnquiryPage.statusDropdown();
         await followUpEnquiryPage.ServiceDetails();
         await followUpEnquiryPage.submitButton();
-        await page.pause();
     })
 
     await test.step('Confirm enquiry', async () => {
+        await followUpEnquiryPage.gotoNewCreatedEnquiry();
+        await confirmEnquiryPage.emailInput();
+        await confirmEnquiryPage.generateUsername();
+        await page.pause();
     });
 });

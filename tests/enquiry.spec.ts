@@ -34,7 +34,11 @@ test('Enquiry Flow', async ({ page }) => {
         await followUpEnquiryPage.departmentDropdown();
         // await followUpEnquiryPage.AssignedRMDropdown();
         await followUpEnquiryPage.statusDropdown();
-        await followUpEnquiryPage.NasDropdown();
-        await page.pause(); // for debug
+        await followUpEnquiryPage.ServiceDetails();
+        await followUpEnquiryPage.submitButton();
+        await page.pause();
     })
+
+    await test.step('Confirm enquiry', async () => {
+    });
 });

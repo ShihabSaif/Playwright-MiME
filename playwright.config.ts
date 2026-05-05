@@ -31,7 +31,7 @@ export default defineConfig({
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
     headless: false, // show browser
-    baseURL: 'https://testconnect.mimebd.com/',
+    baseURL: 'https://mctest-connect.mimebd.com/',
   },
   preserveOutput: 'always',
   /* Configure projects for major browsers */
@@ -59,7 +59,7 @@ export default defineConfig({
       testMatch: /.*enquiry\.spec\.ts/,
       use: {
         storageState: 'playwright/.auth/user.json', // ✅ path to your saved session
-        baseURL: 'https://testconnect.mimebd.com',
+        baseURL: 'https://mctest-connect.mimebd.com/',
         headless: false,
       },
       dependencies: ['setup'],

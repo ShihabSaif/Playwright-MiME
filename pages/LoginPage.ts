@@ -15,7 +15,7 @@ export class LoginPage {
 
   // ✅ Page actions
   async goto() {
-    await this.page.goto('https://testconnect.mimebd.com/');
+    await this.page.goto('https://mctest-connect.mimebd.com/');
   }
 
   async login(username: string, password: string) {

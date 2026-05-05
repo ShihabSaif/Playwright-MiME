@@ -1,4 +1,4 @@
-import { test, Page, expect } from '@playwright/test';
+import { test, Page, expect, Locator } from '@playwright/test';
 
 test.setTimeout(90000);
 
@@ -11,6 +11,20 @@ export class EnquiryPage {
 
     constructor(page: Page) {
         this.page = page;
+    }
+
+    private async selectElementDropdownOption(trigger: Locator, optionText: string) {
+        await trigger.scrollIntoViewIfNeeded();
+        await expect(trigger).toBeVisible({ timeout: 5000 });
+        await trigger.click();
+
+        // Element UI can briefly keep two visible dropdowns during animation.
+        const activeDropdown = this.page.locator('.el-select-dropdown:visible').last();
+        await expect(activeDropdown).toBeVisible({ timeout: 5000 });
+
+        const option = activeDropdown.locator('.el-select-dropdown__item', { hasText: optionText }).first();
+        await expect(option).toBeVisible({ timeout: 5000 });
+        await option.click();
     }
 
     async openSidebarIfCollapsed() {
@@ -55,24 +69,15 @@ export class EnquiryPage {
 
         // Division
         const divisionDropdown = this.page.locator('#Contact_division_req');
-        await divisionDropdown.click();
-        const divisionPanel = this.page.locator('.el-select-dropdown:visible');
-        await expect(divisionPanel).toBeVisible();
-        await divisionPanel.locator('text=Khulna').click();
+        await this.selectElementDropdownOption(divisionDropdown, 'Khulna');
 
         // District
         const districtDropdown = this.page.locator('#Contact_district_req');
-        await districtDropdown.click();
-        const districtPanel = this.page.locator('.el-select-dropdown:visible');
-        await expect(districtPanel).toBeVisible();
-        await districtPanel.locator('text=Bagerhat').click();
+        await this.selectElementDropdownOption(districtDropdown, 'Bagerhat');
 
         // Area
         const areaDropdown = this.page.locator('#Contact_area_req');
-        await areaDropdown.click();
-        const areaPanel = this.page.locator('.el-select-dropdown:visible');
-        await expect(areaPanel).toBeVisible();
-        await areaPanel.locator('text=Chitalmari').click();
+        await this.selectElementDropdownOption(areaDropdown, 'Chitalmari');
     }
 
 
@@ -165,9 +170,11 @@ export class EnquiryPage {
         const bundleDropdown = this.page.locator('input[placeholder="Select Bundle"]');
         await bundleDropdown.scrollIntoViewIfNeeded();
         await bundleDropdown.click();
-        const dropdownPanel = this.page.locator('.el-select-dropdown:visible');
+        const dropdownPanel = this.page.locator('.el-select-dropdown:visible').last();
         await expect(dropdownPanel).toBeVisible({ timeout: 5000 });
-        await dropdownPanel.locator('.el-select-dropdown__item').first().click();
+        const bundleOptions = dropdownPanel.locator('.el-select-dropdown__item');
+        await expect(bundleOptions.nth(1)).toBeVisible({ timeout: 5000 });
+        await bundleOptions.nth(1).click();
 
         // contact address checkbox
         const installationCheckbox = this.page
@@ -209,8 +216,18 @@ export class EnquiryPage {
 
     async clickOTCButton()
     {
-        const addButton = this.page.locator('button.btn >> i.tim-icons.icon-simple-add').nth(3);
+        // The Add Services modal/backdrop can linger briefly and block pointer events.
+        const addServicesDialog = this.page.getByRole('dialog').filter({ hasText: 'Add Services' });
+        const blockingOverlays = this.page.locator('.modal.fade.show.d-block, .modal-backdrop.show');
+        await addServicesDialog.waitFor({ state: 'hidden', timeout: 15000 }).catch(() => {});
+        await expect(blockingOverlays).toHaveCount(0, { timeout: 15000 });
+
+        // Scope to OTC section and click the button element (not the icon).
+        const otcSection = this.page.getByRole('group', { name: /One Time Cost \(OTC\)/i });
+        const addButton = otcSection.locator('button.btn').first();
+        await addButton.scrollIntoViewIfNeeded();
         await expect(addButton).toBeVisible({ timeout: 5000 });
+        await expect(addButton).toBeEnabled({ timeout: 5000 });
         await addButton.click();
     }
 
